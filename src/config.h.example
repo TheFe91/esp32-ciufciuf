@@ -1,0 +1,28 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// ============================================
+// CONFIGURAZIONE WIFI
+// ============================================
+// Inserisci qui le credenziali della tua rete WiFi
+const char *WIFI_SSID = "YOUR_WIFI_SSID";
+const char *WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+
+// ============================================
+// PIN CONFIGURATION
+// ============================================
+// Pin per controllare il relè del motore
+#define RELAY_PIN 2
+
+// Pin I2S per MAX98357A
+#define I2S_BCLK 26 // Bit Clock
+#define I2S_LRC 25  // Left/Right Clock (Word Select)
+#define I2S_DOUT 22 // Data Out
+
+// ============================================
+// AUDIO SETTINGS
+// ============================================
+#define AUDIO_SAMPLE_RATE 22050 // 22kHz per risparmiare memoria
+#define DEFAULT_VOLUME 50       // Volume iniziale (0-100)
+
+#endif
