@@ -48,12 +48,20 @@ Speaker-       →    Speaker- (nero)
 ## Configurazione
 
 ### 1. Configura WiFi
-Apri il file `src/config.h` e inserisci le tue credenziali WiFi:
+Copia il file di configurazione esempio e inserisci le tue credenziali WiFi:
+
+```bash
+cp src/config.h.example src/config.h
+```
+
+Poi modifica `src/config.h` e inserisci le tue credenziali WiFi:
 
 ```cpp
 const char* WIFI_SSID = "IL_TUO_WIFI";
 const char* WIFI_PASSWORD = "LA_TUA_PASSWORD";
 ```
+
+**Nota:** Il file `config.h` è ignorato da git per mantenere private le tue credenziali.
 
 ### 2. Compila e Carica
 In PlatformIO:
