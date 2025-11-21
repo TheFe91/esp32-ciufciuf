@@ -6,15 +6,12 @@ Controller WiFi per trenino natalizio con ESP32, relè motore e riproduzione aud
 
 ## Hardware Necessario
 
-### Componenti da comprare:
-1. **Modulo Relè 5V 1 canale** (~2-3€)
-2. **MAX98357A amplificatore I2S** x3 (9€ su Amazon)
-3. **Alimentazione ESP32** (power bank mini USB o portabatterie AA)
-
-### Componenti già disponibili:
-- ESP32 DevKit
-- Speaker AZDelivery 8Ω 3W con connettore JST
-- Cavi Dupont
+- **ESP32 DevKit** - Microcontrollore principale
+- **Modulo Relè 5V 1 canale** - Controllo motore
+- **MAX98357A amplificatore I2S** - Riproduzione audio
+- **Speaker 8Ω 3W** - Uscita audio
+- **Alimentazione** - 5V per ESP32 (power bank mini USB o portabatterie)
+- **Cavi Dupont** - Collegamenti
 
 ## Schema Collegamenti
 
@@ -91,14 +88,14 @@ Se vuoi controllare il trenino da script o altre app:
 - `GET /audio/volume?value=50` - Imposta volume (0-100)
 - `GET /status` - Ottieni stato corrente (JSON)
 
-## Prossimi Passi
+## Implementazione Audio
 
-### Audio (da implementare quando arriva l'hardware)
-Attualmente l'audio è simulato (vedi Serial Monitor). Quando riceverai il MAX98357A:
+Il firmware attuale include un'interfaccia di base per il controllo audio. Per implementare la riproduzione audio completa:
 
-1. Collega l'hardware come da schema sopra
-2. Aggiungi file audio nella memoria flash ESP32
+1. Collega l'hardware MAX98357A come da schema
+2. Aggiungi file audio nella memoria flash ESP32 (SPIFFS o LittleFS)
 3. Implementa la riproduzione I2S nelle funzioni `audioStart()` e `audioStop()` in `main.cpp`
+4. Utilizza librerie come ESP32-audioI2S per decodifica e riproduzione dei file audio
 
 ### Configurazione Pin (opzionale)
 Se vuoi cambiare i pin, modifica il file `src/config.h`:

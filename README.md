@@ -6,15 +6,12 @@ WiFi controller for Christmas train with ESP32, motor relay and audio playback v
 
 ## Required Hardware
 
-### Components to buy:
-1. **5V 1-channel Relay Module** (~2-3€)
-2. **MAX98357A I2S amplifier** x3 (9€ on Amazon)
-3. **ESP32 Power Supply** (mini USB power bank or AA battery holder)
-
-### Already available components:
-- ESP32 DevKit
-- AZDelivery 8Ω 3W Speaker with JST connector
-- Dupont cables
+- **ESP32 DevKit** - Main microcontroller
+- **5V 1-channel Relay Module** - Motor control
+- **MAX98357A I2S amplifier** - Audio playback
+- **8Ω 3W Speaker** - Audio output
+- **Power Supply** - 5V for ESP32 (mini USB power bank or battery holder)
+- **Dupont cables** - Connections
 
 ## Wiring Diagram
 
@@ -91,14 +88,14 @@ If you want to control the train from scripts or other apps:
 - `GET /audio/volume?value=50` - Set volume (0-100)
 - `GET /status` - Get current status (JSON)
 
-## Next Steps
+## Audio Implementation
 
-### Audio (to be implemented when hardware arrives)
-Currently audio is simulated (see Serial Monitor). When you receive the MAX98357A:
+The current firmware includes a basic audio control interface. To implement full audio playback:
 
-1. Connect the hardware as shown in the diagram above
-2. Add audio files to the ESP32 flash memory
+1. Connect the MAX98357A hardware as shown in the wiring diagram
+2. Add audio files to the ESP32 flash memory (SPIFFS or LittleFS)
 3. Implement I2S playback in the `audioStart()` and `audioStop()` functions in `main.cpp`
+4. Use libraries like ESP32-audioI2S for audio file decoding and playback
 
 ### Pin Configuration (optional)
 If you want to change the pins, edit the `src/config.h` file:
