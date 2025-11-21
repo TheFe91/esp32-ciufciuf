@@ -1,11 +1,11 @@
 /*
- * ESP32 CiufCiuf - Controller Trenino Natalizio
+ * ESP32 CiufCiuf - Christmas Train Controller
  *
  * Features:
- * - Controllo motore tramite relè
- * - Riproduzione audio tramite MAX98357A
- * - Web app per controllo remoto via WiFi
- * - Controllo volume software
+ * - Motor control via relay
+ * - Audio playback via MAX98357A
+ * - Web app for remote WiFi control
+ * - Software volume control
  */
 
 #include <Arduino.h>
@@ -18,7 +18,7 @@
 #include "config.h"
 
 // ============================================
-// VARIABILI GLOBALI
+// GLOBAL VARIABLES
 // ============================================
 AsyncWebServer server(80);
 bool motorRunning = false;
@@ -26,7 +26,7 @@ bool audioPlaying = false;
 int currentVolume = DEFAULT_VOLUME;
 
 // ============================================
-// GESTIONE MOTORE
+// MOTOR MANAGEMENT
 // ============================================
 void motorStart()
 {
@@ -43,16 +43,16 @@ void motorStop()
 }
 
 // ============================================
-// GESTIONE AUDIO MP3
+// MP3 AUDIO MANAGEMENT
 // ============================================
 AudioGeneratorMP3 *mp3 = NULL;
 AudioFileSourceSPIFFS *file = NULL;
 AudioOutputI2S *out = NULL;
 
-// Inizializza il sistema audio
+// Initialize the audio system
 void setupAudio()
 {
-    // Inizializza output I2S
+    // Initialize I2S output
     out = new AudioOutputI2S();
     out->SetPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
     out->SetGain((float)currentVolume / 100.0);
@@ -64,7 +64,7 @@ void audioStart()
 {
     if (!audioPlaying)
     {
-        // Verifica che il file esista
+        // Check if file exists
         if (!SPIFFS.exists("/music.mp3"))
         {
             Serial.println("[AUDIO] Error: /music.mp3 not found in SPIFFS!");
@@ -107,14 +107,14 @@ void audioStop()
 
 void audioLoop()
 {
-    // Continua a riprodurre l'MP3
+    // Continue playing the MP3
     if (audioPlaying && mp3)
     {
         if (mp3->isRunning())
         {
             if (!mp3->loop())
             {
-                // Fine del file, riavvia dall'inizio (loop)
+                // End of file, restart from beginning (loop)
                 mp3->stop();
                 delete mp3;
                 delete file;
@@ -142,11 +142,11 @@ void setVolume(int vol)
 }
 
 // ============================================
-// PAGINA WEB HTML
+// HTML WEB PAGE
 // ============================================
 const char *HTML_PAGE = R"rawliteral(
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -296,18 +296,18 @@ const char *HTML_PAGE = R"rawliteral(
 <body>
     <div class="container">
         <h1>CiufCiuf Controller</h1>
-        <div class="subtitle">Controllo Trenino Natalizio</div>
+        <div class="subtitle">Christmas Train Control</div>
 
         <div class="section">
-            <div class="section-title">Motore</div>
+            <div class="section-title">Motor</div>
             <div class="button-group">
-                <button class="btn-start" onclick="motorStart()">Parti</button>
-                <button class="btn-stop" onclick="motorStop()">Ferma</button>
+                <button class="btn-start" onclick="motorStart()">Start</button>
+                <button class="btn-stop" onclick="motorStop()">Stop</button>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title">Musica</div>
+            <div class="section-title">Music</div>
             <div class="button-group">
                 <button class="btn-start" onclick="audioStart()">Play</button>
                 <button class="btn-stop" onclick="audioStop()">Stop</button>
@@ -325,7 +325,7 @@ const char *HTML_PAGE = R"rawliteral(
 
         <div class="status">
             <div class="status-item">
-                <span class="status-label">Motore:</span>
+                <span class="status-label">Motor:</span>
                 <span class="status-value" id="motorStatus">OFF</span>
             </div>
             <div class="status-item">
@@ -336,7 +336,7 @@ const char *HTML_PAGE = R"rawliteral(
     </div>
 
     <script>
-        // Funzioni per controllare il motore
+        // Functions to control the motor
         function motorStart() {
             fetch('/motor/start')
                 .then(response => response.json())
@@ -357,7 +357,7 @@ const char *HTML_PAGE = R"rawliteral(
                 .catch(error => console.error('Error:', error));
         }
 
-        // Funzioni per controllare l'audio
+        // Functions to control audio
         function audioStart() {
             fetch('/audio/start')
                 .then(response => response.json())
@@ -378,7 +378,7 @@ const char *HTML_PAGE = R"rawliteral(
                 .catch(error => console.error('Error:', error));
         }
 
-        // Funzione per aggiornare il volume
+        // Function to update volume
         function updateVolume(value) {
             document.getElementById('volumeValue').textContent = value;
             fetch('/audio/volume?value=' + value)
@@ -387,7 +387,7 @@ const char *HTML_PAGE = R"rawliteral(
                 .catch(error => console.error('Error:', error));
         }
 
-        // Aggiorna lo stato visualizzato
+        // Update displayed status
         function updateStatus() {
             fetch('/status')
                 .then(response => response.json())
@@ -407,10 +407,10 @@ const char *HTML_PAGE = R"rawliteral(
                 .catch(error => console.error('Error:', error));
         }
 
-        // Aggiorna lo stato ogni 2 secondi
+        // Update status every 2 seconds
         setInterval(updateStatus, 2000);
 
-        // Aggiorna lo stato al caricamento
+        // Update status on load
         updateStatus();
     </script>
 </body>
@@ -418,21 +418,21 @@ const char *HTML_PAGE = R"rawliteral(
 )rawliteral";
 
 // ============================================
-// CONFIGURAZIONE API REST
+// REST API CONFIGURATION
 // ============================================
 void setupWebServer()
 {
-    // Pagina principale
+    // Main page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(200, "text/html", HTML_PAGE); });
 
-    // API - Start motore
+    // API - Start motor
     server.on("/motor/start", HTTP_GET, [](AsyncWebServerRequest *request)
               {
     motorStart();
     request->send(200, "application/json", "{\"status\":\"ok\",\"motor\":true}"); });
 
-    // API - Stop motore
+    // API - Stop motor
     server.on("/motor/stop", HTTP_GET, [](AsyncWebServerRequest *request)
               {
     motorStop();
@@ -481,15 +481,15 @@ void setup()
     delay(1000);
     Serial.println();
     Serial.println("========================================");
-    Serial.println("  ESP32 CiufCiuf - Trenino Natalizio");
+    Serial.println("  ESP32 CiufCiuf - Christmas Train");
     Serial.println("========================================");
 
-    // Configura pin relè
+    // Configure relay pin
     pinMode(RELAY_PIN, OUTPUT);
-    digitalWrite(RELAY_PIN, LOW); // Motore spento all'avvio
+    digitalWrite(RELAY_PIN, LOW); // Motor off at startup
     Serial.println("[INIT] Relay configured on pin " + String(RELAY_PIN));
 
-    // Monta SPIFFS per accedere ai file MP3
+    // Mount SPIFFS to access MP3 files
     if (!SPIFFS.begin(true))
     {
         Serial.println("[SPIFFS] Mount failed!");
@@ -497,7 +497,7 @@ void setup()
     }
     Serial.println("[SPIFFS] Mounted successfully");
 
-    // Lista i file presenti in SPIFFS
+    // List files in SPIFFS
     File root = SPIFFS.open("/");
     File file = root.openNextFile();
     Serial.println("[SPIFFS] Files:");
@@ -511,10 +511,10 @@ void setup()
         file = root.openNextFile();
     }
 
-    // Inizializza sistema audio
+    // Initialize audio system
     setupAudio();
 
-    // Connessione WiFi
+    // WiFi connection
     Serial.println();
     Serial.print("[WIFI] Connecting to ");
     Serial.println(WIFI_SSID);
@@ -537,7 +537,7 @@ void setup()
         Serial.println(WiFi.localIP());
         Serial.println();
         Serial.println("========================================");
-        Serial.println("  Apri il browser e vai su:");
+        Serial.println("  Open your browser and go to:");
         Serial.print("  http://");
         Serial.println(WiFi.localIP());
         Serial.println("========================================");
@@ -549,7 +549,7 @@ void setup()
         Serial.println("[WIFI] Please check credentials in config.h");
     }
 
-    // Avvia web server
+    // Start web server
     setupWebServer();
     Serial.println("[WEB] Server started");
 
@@ -563,9 +563,9 @@ void setup()
 // ============================================
 void loop()
 {
-    // Gestisce la riproduzione MP3
+    // Handle MP3 playback
     audioLoop();
 
-    // Il web server gira in background
+    // Web server runs in background
     delay(1);
 }
